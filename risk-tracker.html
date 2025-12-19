@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>متابعة استراتيجية 100 صفقة | إدارة المخاطر</title>
+  <style>
+    :root{
+      --bg:#0b1020; --card:#111a33; --muted:#98a2b3; --text:#eef2ff;
+      --accent:#7c3aed; --accent2:#22c55e; --danger:#ef4444; --warn:#f59e0b;
+      --line:#223055;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background: radial-gradient(1200px 700px at 20% 0%, #172554 0%, var(--bg) 55%),
+                  radial-gradient(900px 600px at 90% 20%, #2e1065 0%, var(--bg) 55%);
+      color:var(--text);
+    }
+    header{
+      padding:22px 16px 10px;
+      max-width:1200px; margin:0 auto;
+    }
+    h1{margin:0 0 6px; font-size:22px}
+    p{margin:0; color:var(--muted); font-size:13px; line-height:1.6}
+    .wrap{max-width:1200px; margin:0 auto; padding:12px 16px 40px}
+    .grid{
+      display:grid; gap:12px;
+      grid-template-columns: 1.15fr .85fr;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: rgba(17,26,51,.85);
+      border: 1px solid rgba(34,48,85,.8);
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      border-radius:16px;
+      padding:14px;
+      backdrop-filter: blur(10px);
+    }
+    .card h2{margin:0 0 10px; font-size:15px; color:#fff}
+    .row{display:grid; gap:10px; grid-template-columns: repeat(4,1fr)}
+    @media (max-width: 820px){
+      .row{grid-template-columns: repeat(2,1fr)}
+    }
+    label{display:block; font-size:12px; color:var(--muted); margin:0 0 6px}
+    input, select, textarea, button{
+      width:100%; border-radius:12px; border:1px solid rgba(34,48,85,.9);
+      background: rgba(12,18,40,.85); color:var(--text);
+      padding:10px 10px; outline:none;
+    }
+    textarea{min-height:86px; resize:vertical}
+    input:focus, select:focus, textarea:focus{border-color: rgba(124,58,237,.8)}
+    .btns{display:flex; gap:10px; flex-wrap:wrap}
+    button{
+      cursor:pointer; font-weight:700;
+      transition:.15s transform ease, .15s opacity ease;
+    }
+    button:hover{transform: translateY(-1px)}
+    .primary{background: linear-gradient(135deg, rgba(124,58,237,.95), rgba(59,130,246,.8)); border:none}
+    .ghost{background: transparent}
+    .ok{background: rgba(34,197,94,.15); border-color: rgba(34,197,94,.35)}
+    .bad{background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.35)}
+    .warn{background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.35)}
+    .kpis{
+      display:grid; gap:10px;
+      grid-template-columns: repeat(4,1fr);
+    }
+    @media (max-width: 980px){ .kpis{grid-template-columns: repeat(2,1fr)} }
+    .kpi{
+      padding:12px; border-radius:14px; border:1px solid rgba(34,48,85,.8);
+      background: rgba(12,18,40,.55);
+    }
+    .kpi .t{font-size:12px; color:var(--muted)}
+    .kpi .v{font-size:18px; font-weight:800; margin-top:4px}
+    .kpi .s{font-size:12px; color:var(--muted); margin-top:2px}
+    table{width:100%; border-collapse:collapse; overflow:auto}
+    th, td{
+      padding:10px 8px; border-bottom:1px solid rgba(34,48,85,.7);
+      font-size:13px; vertical-align:top;
+    }
+    th{color: #c7d2fe; font-weight:800; text-align:right; position:sticky; top:0; background: rgba(17,26,51,.95)}
+    .pill{
+      display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:800;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+    }
+    .pill.buy{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12)}
+    .pill.sell{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12)}
+    .pill.win{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.12)}
+    .pill.loss{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.12)}
+    .small{font-size:12px; color:var(--muted)}
+    .split{display:grid; gap:12px; grid-template-columns: 1fr 1fr}
+    @media (max-width: 820px){ .split{grid-template-columns:1fr} }
+    canvas{width:100%; height:240px; border-radius:14px; border:1px solid rgba(34,48,85,.8); background: rgba(12,18,40,.55)}
+    .note{color:var(--muted); font-size:12px; line-height:1.55}
+    .danger-text{color:#fecaca}
+    .ok-text{color:#bbf7d0}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;}
+  </style>
+</head>
+<body>
+<header>
+  <h1>📘 متابعة استراتيجية 100 صفقة — إدارة المخاطر (R / RR / HR)</h1>
+  <p>سجّل 100 صفقة بنفس القواعد. هذا الموقع يحسب لك النتائج تلقائيًا ويعطيك HR + Expectancy + منحنى الرصيد.</p>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <!-- Left: Logger + Table -->
+    <div class="card">
+      <h2>➕ إضافة صفقة</h2>
+      <div class="row">
+        <div>
+          <label>الرصيد الحالي (Balance)</label>
+          <input id="balance" type="number" step="0.01" placeholder="مثال: 10000" />
+        </div>
+        <div>
+          <label>نسبة المخاطرة % (Risk%)</label>
+          <input id="riskPct" type="number" step="0.01" value="1" />
+        </div>
+        <div>
+          <label>الزوج / الأصل</label>
+          <input id="symbol" type="text" placeholder="BTCUSDT" />
+        </div>
+        <div>
+          <label>نوع الصفقة</label>
+          <select id="side">
+            <option value="BUY">شراء (BUY)</option>
+            <option value="SELL">بيع (SELL)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div>
+          <label>سعر الدخول (Entry)</label>
+          <input id="entry" type="number" step="0.00000001" placeholder="مثال: 42000" />
+        </div>
+        <div>
+          <label>Stop Loss</label>
+          <input id="stop" type="number" step="0.00000001" placeholder="مثال: 41500" />
+        </div>
+        <div>
+          <label>Take Profit</label>
+          <input id="tp" type="number" step="0.00000001" placeholder="مثال: 43000" />
+        </div>
+        <div>
+          <label>النتيجة (Outcome)</label>
+          <select id="outcome">
+            <option value="WIN">ربح (TP)</option>
+            <option value="LOSS">خسارة (SL)</option>
+            <option value="BE">تعادل (BE)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="split" style="margin-top:10px">
+        <div>
+          <label>ملاحظات (اختياري)</label>
+          <textarea id="notes" placeholder="مثال: اتجاه صاعد + RSI فوق 50 + MACD إيجابي..."></textarea>
+        </div>
+        <div>
+          <div class="card" style="padding:12px; background: rgba(12,18,40,.55)">
+            <div class="note">
+              <div>✅ يحسب تلقائيًا:</div>
+              <ul style="margin:8px 0 0 18px; padding:0; line-height:1.7">
+                <li><span class="mono">1R = Balance × Risk%</span></li>
+                <li><span class="mono">SL distance = |Entry - Stop|</span></li>
+                <li><span class="mono">TP distance = |TP - Entry|</span></li>
+                <li><span class="mono">RR = TPdist / SLdist</span></li>
+                <li><span class="mono">PnL(R) = WIN:+RR / LOSS:-1 / BE:0</span></li>
+              </ul>
+              <div style="margin-top:8px" class="danger-text">ملاحظة: هذا تتبّع إحصائي. لو بدك حساب حجم العقد الحقيقي (Position Size) حسب منصة معينة، بضيفه لك.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="btns" style="margin-top:10px">
+        <button class="primary" id="addBtn">إضافة الصفقة</button>
+        <button class="ghost warn" id="resetFormBtn">مسح الحقول</button>
+        <button class="ghost bad" id="clearAllBtn">حذف كل البيانات</button>
+        <button class="ghost ok" id="exportBtn">تصدير JSON</button>
+        <button class="ghost" id="importBtn">استيراد JSON</button>
+      </div>
+
+      <div style="margin-top:14px">
+        <h2>📑 سجل الصفقات</h2>
+        <div class="small">عدد الصفقات: <b id="count">0</b> / 100</div>
+        <div style="overflow:auto; margin-top:8px; border-radius:14px; border:1px solid rgba(34,48,85,.8)">
+          <table id="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الأصل</th>
+                <th>نوع</th>
+                <th>Entry</th>
+                <th>SL</th>
+                <th>TP</th>
+                <th>RR</th>
+                <th>النتيجة</th>
+                <th>PnL (R)</th>
+                <th>ملاحظات</th>
+                <th>حذف</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:10px">
+          🎯 قاعدة الربح الدنيا مع <span class="mono">RR=1:2</span> هي تقريبًا <b>34%</b> HR.
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: KPIs + Chart -->
+    <div class="card">
+      <h2>📊 النتائج والإحصائيات</h2>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">Hit Rate (HR)</div>
+          <div class="v" id="hr">—</div>
+          <div class="s">نسبة الصفقات الرابحة</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Average RR</div>
+          <div class="v" id="avgRR">—</div>
+          <div class="s">متوسط RR للصفقات</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Net R</div>
+          <div class="v" id="netR">—</div>
+          <div class="s">صافي R (ربح/خسارة)</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Expectancy</div>
+          <div class="v" id="exp">—</div>
+          <div class="s">متوسط R لكل صفقة</div>
+        </div>
+      </div>
+
+      <div class="kpis" style="margin-top:10px">
+        <div class="kpi">
+          <div class="t">Wins / Losses / BE</div>
+          <div class="v" id="wlb">—</div>
+          <div class="s">توزيع النتائج</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Current Balance (est.)</div>
+          <div class="v" id="balEst">—</div>
+          <div class="s">تقدير الرصيد بعد PnL(R)</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Max Drawdown (R)</div>
+          <div class="v" id="mdd">—</div>
+          <div class="s">أكبر سحب</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Streak</div>
+          <div class="v" id="streak">—</div>
+          <div class="s">آخر سلسلة (W/L)</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <h2>📈 منحنى الرصيد (Equity Curve)</h2>
+        <canvas id="chart" width="900" height="300"></canvas>
+        <div class="note" style="margin-top:8px">
+          كل نقطة = صفقة. الرسم يعتمد على <b>PnL بوحدة R</b> مع افتراض أن <b>Risk%</b ثابت (زي ما بدك).
+        </div>
+      </div>
+
+      <div style="margin-top:12px" class="note">
+        ✅ توصية تدريب:
+        <ul style="margin:8px 0 0 18px; padding:0; line-height:1.7">
+          <li>التزم 100 صفقة بنفس RR (مثلًا 1:2) لتطلع بإحصائية صادقة.</li>
+          <li>لا تغيّر القواعد أثناء الـ 100 صفقة.</li>
+          <li>بعد 100 صفقة بنقرر: نرفع RR؟ نضيف إدارة صفقة؟ ولا نفلتر السوق أكثر؟</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<input id="importFile" type="file" accept="application/json" style="display:none" />
+
+<script>
+  "use strict";
+
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n, d=2) => (Number.isFinite(n) ? n.toFixed(d) : "—");
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  function safeNum(v){
+    const x = Number(v);
+    return Number.isFinite(x) ? x : NaN;
+  }
+
+  function calcRR(entry, stop, tp){
+    const sl = Math.abs(entry - stop);
+    const tg = Math.abs(tp - entry);
+    if(!Number.isFinite(sl) || !Number.isFinite(tg) || sl <= 0 || tg <= 0) return NaN;
+    return tg / sl;
+  }
+
+  function outcomeToR(outcome, rr){
+    if(outcome === "WIN") return rr;
+    if(outcome === "LOSS") return -1;
+    return 0; // BE
+  }
+
+  // ---------- Storage ----------
+  const KEY = "risk_tracker_v1";
+  function load(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(!raw) return { trades: [] };
+      const obj = JSON.parse(raw);
+      if(!obj || !Array.isArray(obj.trades)) return { trades: [] };
+      return obj;
+    }catch{
+      return { trades: [] };
+    }
+  }
+  function save(state){
+    localStorage.setItem(KEY, JSON.stringify(state));
+  }
+
+  let state = load();
+
+  // ---------- UI Actions ----------
+  function resetForm(){
+    $("symbol").value = "";
+    $("side").value = "BUY";
+    $("entry").value = "";
+    $("stop").value = "";
+    $("tp").value = "";
+    $("outcome").value = "WIN";
+    $("notes").value = "";
+  }
+
+  function addTrade(){
+    const balance = safeNum($("balance").value);
+    const riskPct = safeNum($("riskPct").value);
+
+    const symbol = ($("symbol").value || "").trim().toUpperCase() || "—";
+    const side = $("side").value;
+
+    const entry = safeNum($("entry").value);
+    const stop  = safeNum($("stop").value);
+    const tp    = safeNum($("tp").value);
+    const outcome = $("outcome").value;
+    const notes = ($("notes").value || "").trim();
+
+    // Basic validation
+    const errors = [];
+    if(!Number.isFinite(balance) || balance <= 0) errors.push("اكتب Balance صحيح.");
+    if(!Number.isFinite(riskPct) || riskPct <= 0 || riskPct > 10) errors.push("Risk% لازم يكون بين 0 و 10 (مثلاً 1).");
+    if(!Number.isFinite(entry) || !Number.isFinite(stop) || !Number.isFinite(tp)) errors.push("لازم تدخل Entry / SL / TP أرقام.");
+    const rr = calcRR(entry, stop, tp);
+    if(!Number.isFinite(rr)) errors.push("تأكد إن Entry/SL/TP مش نفس الرقم وإنهم منطقيين.");
+
+    if(errors.length){
+      alert(errors.join("\n"));
+      return;
+    }
+
+    const riskAmount = balance * (riskPct/100); // 1R in currency (for reference)
+    const pnlR = outcomeToR(outcome, rr);
+
+    state.trades.push({
+      ts: Date.now(),
+      balance,
+      riskPct,
+      riskAmount,
+      symbol,
+      side,
+      entry,
+      stop,
+      tp,
+      rr,
+      outcome,
+      pnlR,
+      notes
+    });
+
+    save(state);
+    render();
+    resetForm();
+  }
+
+  function deleteTrade(idx){
+    if(!confirm("متأكد بدك تحذف الصفقة؟")) return;
+    state.trades.splice(idx, 1);
+    save(state);
+    render();
+  }
+
+  function clearAll(){
+    if(!confirm("هذا رح يمسح كل بياناتك من المتصفح. متأكد؟")) return;
+    state = { trades: [] };
+    save(state);
+    render();
+  }
+
+  function exportJSON(){
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "risk-tracker-data.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(){
+    $("importFile").click();
+  }
+
+  $("importFile").addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const obj = JSON.parse(text);
+      if(!obj || !Array.isArray(obj.trades)) throw new Error("صيغة الملف غلط.");
+      state = obj;
+      save(state);
+      render();
+      alert("تم الاستيراد ✅");
+    }catch(err){
+      alert("فشل الاستيراد: " + (err?.message || "خطأ"));
+    }finally{
+      e.target.value = "";
+    }
+  });
+
+  // ---------- Stats ----------
+  function computeStats(trades){
+    const total = trades.length;
+    const wins = trades.filter(t => t.outcome === "WIN").length;
+    const losses = trades.filter(t => t.outcome === "LOSS").length;
+    const be = trades.filter(t => t.outcome === "BE").length;
+
+    const hr = total ? (wins / total) : NaN;
+    const avgRR = total ? (trades.reduce((s,t)=> s + (Number.isFinite(t.rr)?t.rr:0), 0) / total) : NaN;
+    const netR = trades.reduce((s,t)=> s + (Number.isFinite(t.pnlR)?t.pnlR:0), 0);
+    const exp = total ? (netR / total) : NaN;
+
+    // Equity curve in R and balance estimate with compounding (risk% constant per trade balance snapshot)
+    let equityR = 0;
+    let peakR = 0;
+    let maxDD = 0;
+
+    // Balance estimate (compounding) using each trade's riskPct and its own starting balance snapshot if provided
+    // We'll recompute from the first trade's balance (or current input if empty)
+    let bal = trades[0]?.balance ?? safeNum($("balance").value) ?? 0;
+
+    const curve = [{i:0, r:0, bal}];
+    let lastStreak = "";
+    let streakCount = 0;
+
+    for(let i=0;i<trades.length;i++){
+      const t = trades[i];
+      const r = Number.isFinite(t.pnlR) ? t.pnlR : 0;
+
+      // streak
+      const tag = t.outcome === "WIN" ? "W" : (t.outcome === "LOSS" ? "L" : "B");
+      if(i===0){ lastStreak = tag; streakCount = 1; }
+      else{
+        if(tag === lastStreak) streakCount++;
+        else{ lastStreak = tag; streakCount = 1; }
+      }
+
+      equityR += r;
+      peakR = Math.max(peakR, equityR);
+      const dd = peakR - equityR;
+      maxDD = Math.max(maxDD, dd);
+
+      // compounding balance estimate:
+      const rp = Number.isFinite(t.riskPct) ? t.riskPct : 1;
+      const riskAmount = bal * (rp/100);
+      const pnl = riskAmount * r; // because -1R = -riskAmount, +rrR = +riskAmount*rr
+      bal = bal + pnl;
+
+      curve.push({i:i+1, r:equityR, bal});
+    }
+
+    const streakLabel = total ? `${lastStreak} × ${streakCount}` : "—";
+
+    return {
+      total, wins, losses, be,
+      hr, avgRR, netR, exp,
+      maxDD, curve, balEst: bal, streakLabel
+    };
+  }
+
+  // ---------- Render ----------
+  function renderTable(trades){
+    const tb = $("table").querySelector("tbody");
+    tb.innerHTML = "";
+
+    trades.forEach((t, idx) => {
+      const tr = document.createElement("tr");
+
+      const rrTxt = Number.isFinite(t.rr) ? fmt(t.rr, 2) : "—";
+      const pnlTxt = Number.isFinite(t.pnlR) ? fmt(t.pnlR, 2) : "—";
+
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td class="mono">${escapeHtml(t.symbol || "—")}</td>
+        <td><span class="pill ${t.side === "BUY" ? "buy" : "sell"}">${t.side}</span></td>
+        <td class="mono">${fmt(t.entry, 6)}</td>
+        <td class="mono">${fmt(t.stop, 6)}</td>
+        <td class="mono">${fmt(t.tp, 6)}</td>
+        <td class="mono">${rrTxt}</td>
+        <td><span class="pill ${t.outcome === "WIN" ? "win" : (t.outcome === "LOSS" ? "loss" : "")}">${t.outcome}</span></td>
+        <td class="mono">${pnlTxt}</td>
+        <td>${escapeHtml(t.notes || "")}</td>
+        <td><button class="ghost bad" data-del="${idx}">حذف</button></td>
+      `;
+      tb.appendChild(tr);
+    });
+
+    tb.querySelectorAll("button[data-del]").forEach(btn=>{
+      btn.addEventListener("click", () => deleteTrade(Number(btn.dataset.del)));
+    });
+  }
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function renderKPIs(s){
+    $("count").textContent = s.total;
+    $("hr").textContent = Number.isFinite(s.hr) ? (fmt(s.hr*100, 1) + "%") : "—";
+    $("avgRR").textContent = Number.isFinite(s.avgRR) ? fmt(s.avgRR, 2) : "—";
+    $("netR").textContent = fmt(s.netR, 2) + " R";
+    $("exp").textContent = fmt(s.exp, 2) + " R/Trade";
+    $("wlb").textContent = `${s.wins} / ${s.losses} / ${s.be}`;
+    $("balEst").textContent = Number.isFinite(s.balEst) ? fmt(s.balEst, 2) : "—";
+    $("mdd").textContent = fmt(s.maxDD, 2) + " R";
+    $("streak").textContent = s.streakLabel;
+  }
+
+  function drawChart(curve){
+    const c = $("chart");
+    const ctx = c.getContext("2d");
+    const W = c.width, H = c.height;
+
+    ctx.clearRect(0,0,W,H);
+
+    // background grid
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = 1;
+    for(let i=0;i<=6;i++){
+      const y = (H-20) * (i/6) + 10;
+      ctx.strokeStyle = "rgba(152,162,179,0.12)";
+      ctx.beginPath(); ctx.moveTo(10, y); ctx.lineTo(W-10, y); ctx.stroke();
+    }
+
+    if(!curve.length) return;
+
+    const xs = curve.map(p=>p.i);
+    const ys = curve.map(p=>p.bal);
+
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+
+    const pad = 18;
+    const xScale = (x) => {
+      if(maxX === minX) return pad;
+      return pad + (x - minX) * ((W - 2*pad) / (maxX - minX));
+    };
+    const yScale = (y) => {
+      if(maxY === minY) return H/2;
+      return (H - pad) - (y - minY) * ((H - 2*pad) / (maxY - minY));
+    };
+
+    // Line
+    ctx.strokeStyle = "rgba(124,58,237,0.95)";
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    curve.forEach((p, i) => {
+      const x = xScale(p.i);
+      const y = yScale(p.bal);
+      if(i===0) ctx.moveTo(x,y);
+      else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // End dot
+    const last = curve[curve.length-1];
+    ctx.fillStyle = "rgba(34,197,94,0.95)";
+    ctx.beginPath();
+    ctx.arc(xScale(last.i), yScale(last.bal), 4.2, 0, Math.PI*2);
+    ctx.fill();
+
+    // labels
+    ctx.fillStyle = "rgba(238,242,255,0.85)";
+    ctx.font = "12px system-ui";
+    ctx.fillText(`Start: ${fmt(curve[0].bal,2)}`, 14, 18);
+    ctx.fillText(`End: ${fmt(last.bal,2)}`, 14, 36);
+  }
+
+  function render(){
+    renderTable(state.trades);
+    const stats = computeStats(state.trades);
+    renderKPIs(stats);
+    drawChart(stats.curve);
+  }
+
+  // ---------- Hook buttons ----------
+  $("addBtn").addEventListener("click", addTrade);
+  $("resetFormBtn").addEventListener("click", resetForm);
+  $("clearAllBtn").addEventListener("click", clearAll);
+  $("exportBtn").addEventListener("click", exportJSON);
+  $("importBtn").addEventListener("click", importJSON);
+
+  // Initial default balance from last trade if exists
+  if(state.trades.length){
+    $("balance").value = state.trades[state.trades.length-1].balance ?? "";
+    $("riskPct").value = state.trades[state.trades.length-1].riskPct ?? 1;
+  }else{
+    $("balance").value = 10000;
+    $("riskPct").value = 1;
+  }
+
+  render();
+</script>
+</body>
+</html>
